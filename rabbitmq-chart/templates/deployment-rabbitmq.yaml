@@ -1,0 +1,50 @@
+{{- if .Values.rabbitmq.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "rabbitmq-server.fullname" . }}
+  labels: {{- include "rabbitmq-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.rabbitmq.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "rabbitmq-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "rabbitmq-chart.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.rabbitmq.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "rabbitmq-chart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ template "rabbitmq-server.fullname" . }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: {{ .Values.rabbitmq.image.repository }}
+        imagePullPolicy: {{ .Values.rabbitmq.image.pullPolicy }}
+        ports:
+        - name: {{ .Values.rabbitmq.ports.containerPortAPIname }}
+          containerPort: {{ .Values.rabbitmq.ports.containerPortAPI }}
+        - name: {{ .Values.rabbitmq.ports.containerPortGUIname }}
+          containerPort: {{ .Values.rabbitmq.ports.containerPortGUI }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      restartPolicy: {{ .Values.rabbitmq.image.restartPolicy }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end }}

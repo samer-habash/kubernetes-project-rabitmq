@@ -1,0 +1,109 @@
+# Default values for rabbitmq-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name:
+
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    host: chart-rabbitmq.local
+    paths: []
+  tls: []
+
+rabbitmq:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: rabbitmq:3-management
+    pullPolicy: IfNotPresent
+    restartPolicy: Always
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+
+  service:
+    type: ClusterIP
+    APIportname: api-svcport
+    APIport: 5672
+    APItargetPort: 5672
+    APIportprotocol: TCP
+
+    GUIportname: gui-svcport
+    GUIport: 15672
+    GUItargetPort: 15672
+    GUIportprotocl: TCP
+
+  ports:
+    containerPortAPIname: rabbit-apiport
+    containerPortAPI: 5672
+    containerPortGUIname: rabbit-guiport
+    containerPortGUI: 15672
+
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+
+producer:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: samer1984/standalone-producer:latest
+    pullPolicy: IfNotPresent
+    restartPolicy: Always
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  env:
+    name: message_count
+    value: "30"
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+
+consumer:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: samer1984/standalone-consumer:latest
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  podSecurityContext: {}
+    # fsGroup: 2000
+
+  securityContext: {}
+
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: standalone-producer
+  labels:
+    script: standalone-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      script: standalone-producer
+  template:
+    metadata:
+      labels:
+        script: standalone-producer
+    spec:
+      containers:
+      - name: standalone-producer
+        env:
+        - name: Message_Count
+          value: "30"
+        command: ["python", "producer.py", "-p", "5672", "-s", "rabbitmq"]
+        args: ["-r", "$(Message_Count)"]
+        image: samer1984/standalone-producer:latest
+      restartPolicy: Always

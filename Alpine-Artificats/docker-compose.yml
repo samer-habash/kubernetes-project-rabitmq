@@ -6,13 +6,13 @@ services:
     ports:
     - 5672:5672 # port for the daemon API
     - 15672:15672 # port for the RabbitMQ management interface
-  standalone_consumer:
-    build: standalone_consumer
+  standalone-consumer:
+    build: standalone-consumer
     links:
     - rabbitmq
     command: python consumer.py -p 5672 -s rabbitmq
-  standalone_producer:
-    build: standalone_producer
+  standalone-producer:
+    build: standalone-producer
     links:
     - rabbitmq
     # run the producer sending random messages -r times
