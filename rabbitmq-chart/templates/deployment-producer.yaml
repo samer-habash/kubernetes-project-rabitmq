@@ -31,7 +31,7 @@ spec:
         env:
         - name: {{ .Values.producer.env.name }}
           value: "{{ .Values.producer.env.value }}"
-        command: ["python", "producer.py", "-p", "{{ .Values.rabbitmq.ports.containerPortAPI }}", "-s", "{{ template "rabbitmq-server.fullname" . }}"]
+        command: ["python", "producer.py", "-p", "{{ .Values.rabbitmq.ports.containerPortAPI }}", "-s", "{{ .Values.rabbitmq.service.name }}"]
         args: ["-r", "$({{ .Values.producer.env.name }})"]
         resources:
           {{- toYaml .Values.resources | nindent 10 }}

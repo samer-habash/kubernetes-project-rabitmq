@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "rabbitmq-server.fullname" . }}
+  name: {{ .Values.rabbitmq.service.name }}
   labels:
     {{- include "rabbitmq-chart.labels" . | nindent 4 }}
 spec:

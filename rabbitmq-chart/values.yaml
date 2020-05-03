@@ -34,6 +34,9 @@ rabbitmq:
   securityContext: {}
 
   service:
+    # the name of service is crucial, and will be automatically used when producer/consumer run the python with -s flag (-s rabbitmq)
+    # the service name is the dns name that will be let producer/consumer connect to as explained in above line
+    name: rabbitmq
     type: ClusterIP
     APIportname: api-svcport
     APIport: 5672
