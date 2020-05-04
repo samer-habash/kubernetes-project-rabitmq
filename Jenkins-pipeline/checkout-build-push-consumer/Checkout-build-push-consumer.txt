@@ -1,0 +1,212 @@
+Started by user admin
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] Start of Pipeline
+[Pipeline] podTemplate
+[Pipeline] {
+[Pipeline] node
+Still waiting to schedule task
+Waiting for next available executor
+Created Pod: default/kubernetes-project-pod-label-ssc4j-lx44r
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Scheduled] Successfully assigned default/kubernetes-project-pod-label-ssc4j-lx44r to sam-xps
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Pulling] Pulling image "docker:latest"
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Pulled] Successfully pulled image "docker:latest"
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Created] Created container docker
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Started] Started container docker
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Pulled] Container image "jenkins/jnlp-slave:4.0.1-1" already present on machine
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Created] Created container jnlp
+[Normal][default/kubernetes-project-pod-label-ssc4j-lx44r][Started] Started container jnlp
+Agent kubernetes-project-pod-label-ssc4j-lx44r is provisioned from template kubernetes-project-pod-label-ssc4j
+---
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  annotations:
+    buildUrl: "http://jenkins:8080/job/consumer-build-push-docker-image/4/"
+    runUrl: "job/consumer-build-push-docker-image/4/"
+  labels:
+    jenkins/jenkins-slave: "true"
+    jenkins/label: "kubernetes-project-pod-label"
+  name: "kubernetes-project-pod-label-ssc4j-lx44r"
+spec:
+  containers:
+  - command:
+    - "cat"
+    image: "docker:latest"
+    name: "docker"
+    tty: true
+    volumeMounts:
+    - mountPath: "/var/run/docker.sock"
+      name: "docker-socket"
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  - env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_TUNNEL"
+      value: "jenkins-agent:50000"
+    - name: "JENKINS_AGENT_NAME"
+      value: "kubernetes-project-pod-label-ssc4j-lx44r"
+    - name: "JENKINS_NAME"
+      value: "kubernetes-project-pod-label-ssc4j-lx44r"
+    - name: "JENKINS_AGENT_WORKDIR"
+      value: "/home/jenkins/agent"
+    - name: "JENKINS_URL"
+      value: "http://jenkins:8080/"
+    image: "jenkins/jnlp-slave:4.0.1-1"
+    name: "jnlp"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+    volumeMounts:
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  nodeSelector:
+    beta.kubernetes.io/os: "linux"
+  restartPolicy: "Never"
+  securityContext: {}
+  volumes:
+  - emptyDir:
+      medium: ""
+    name: "workspace-volume"
+  - hostPath:
+      path: "/var/run/docker.sock"
+    name: "docker-socket"
+
+Running on kubernetes-project-pod-label-ssc4j-lx44r in /home/jenkins/agent/workspace/consumer-build-push-docker-image
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout SCM)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
++ apk add --no-cache subversion
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.11/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.11/community/x86_64/APKINDEX.tar.gz
+(1/11) Installing libuuid (2.34-r1)
+(2/11) Installing apr (1.7.0-r0)
+(3/11) Installing expat (2.2.9-r1)
+(4/11) Installing apr-util (1.6.1-r6)
+(5/11) Installing db (5.3.28-r1)
+(6/11) Installing lz4-libs (1.9.2-r0)
+(7/11) Installing libsasl (2.1.27-r5)
+(8/11) Installing serf (1.3.9-r5)
+(9/11) Installing sqlite-libs (3.30.1-r1)
+(10/11) Installing subversion-libs (1.12.2-r1)
+(11/11) Installing subversion (1.12.2-r1)
+Executing subversion-1.12.2-r1.pre-install
+Executing busybox-1.31.1-r9.trigger
+OK: 19 MiB in 31 packages
++ svn co https://github.com/samer-habash/kubernetes-project-rabitmq/trunk/app/consumer/ . --depth files
+A    Dockerfile
+A    Dockerfile_original
+A    consumer.py
+A    requirements.txt
+Checked out revision 8.
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build Image)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
++ docker build -t jenkins-consumer:latest .
+Sending build context to Docker daemon  141.8kB
+Step 1/5 : FROM python:2.7-alpine
+ ---> 8579e446340f
+Step 2/5 : ENV PYTHONPATH /usr/src/app
+ ---> Using cache
+ ---> a7b5c9eac83b
+Step 3/5 : WORKDIR /usr/src/app
+ ---> Using cache
+ ---> 2b866429da78
+Step 4/5 : COPY ./ ./
+ ---> 032c8b4d8b1f
+Step 5/5 : RUN pip install -r requirements.txt
+ ---> Running in b69490d4b18a
+[91mDEPRECATION: Python 2.7 reached the end of its life on January 1st, 2020. Please upgrade your Python as Python 2.7 is no longer maintained. A future version of pip will drop support for Python 2.7. More details about Python 2 support in pip, can be found at https://pip.pypa.io/en/latest/development/release-process/#python-2-support
+[0mCollecting argparse==1.4.0
+  Downloading argparse-1.4.0-py2.py3-none-any.whl (23 kB)
+Collecting pika==0.9.14
+  Downloading pika-0.9.14.tar.gz (72 kB)
+Requirement already satisfied: wsgiref==0.1.2 in /usr/local/lib/python2.7 (from -r requirements.txt (line 3)) (0.1.2)
+Collecting requests
+  Downloading requests-2.23.0-py2.py3-none-any.whl (58 kB)
+Collecting idna<3,>=2.5
+  Downloading idna-2.9-py2.py3-none-any.whl (58 kB)
+Collecting chardet<4,>=3.0.2
+  Downloading chardet-3.0.4-py2.py3-none-any.whl (133 kB)
+Collecting urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1
+  Downloading urllib3-1.25.9-py2.py3-none-any.whl (126 kB)
+Collecting certifi>=2017.4.17
+  Downloading certifi-2020.4.5.1-py2.py3-none-any.whl (157 kB)
+Building wheels for collected packages: pika
+  Building wheel for pika (setup.py): started
+  Building wheel for pika (setup.py): finished with status 'done'
+  Created wheel for pika: filename=pika-0.9.14-py2-none-any.whl size=82343 sha256=8ce3c60365502ab5a03aa04486c49296eb3785cff8636c919e4b5f520e358424
+  Stored in directory: /root/.cache/pip/wheels/60/01/d9/f5c6b2c73772c5b12d28f84a6bc2673c2814725c665a7fe2c3
+Successfully built pika
+Installing collected packages: argparse, pika, idna, chardet, urllib3, certifi, requests
+Successfully installed argparse-1.4.0 certifi-2020.4.5.1 chardet-3.0.4 idna-2.9 pika-0.9.14 requests-2.23.0 urllib3-1.25.9
+[91mWARNING: You are using pip version 20.0.2; however, version 20.1 is available.
+You should consider upgrading via the '/usr/local/bin/python -m pip install --upgrade pip' command.
+[0mRemoving intermediate container b69490d4b18a
+ ---> eaadab2cd8fd
+Successfully built eaadab2cd8fd
+Successfully tagged jenkins-consumer:latest
++ docker tag jenkins-consumer:latest samer1984/jenkins-consumer:latest
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Push Image)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] withDockerRegistry
+Executing sh script inside container docker of pod kubernetes-project-pod-label-ssc4j-lx44r
+Executing command: "docker" "login" "-u" "samer1984" "-p" ******** "https://index.docker.io/v1/" 
+exit
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /home/jenkins/agent/workspace/consumer-build-push-docker-image@tmp/5cd171f7-9ead-4fe6-9bd3-9ab1c059239a/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[Pipeline] {
+[Pipeline] sh
++ docker push samer1984/jenkins-consumer:latest
+The push refers to repository [docker.io/samer1984/jenkins-consumer]
+977fc1221c2c: Preparing
+be8d918093ae: Preparing
+e32e83f4ec23: Preparing
+879c0d8666e3: Preparing
+20a7b70bdf2f: Preparing
+3fc750b41be7: Preparing
+beee9f30bc1f: Preparing
+3fc750b41be7: Waiting
+beee9f30bc1f: Waiting
+e32e83f4ec23: Mounted from samer1984/jenkins-producer
+879c0d8666e3: Mounted from samer1984/jenkins-producer
+20a7b70bdf2f: Mounted from samer1984/jenkins-producer
+be8d918093ae: Pushed
+3fc750b41be7: Mounted from samer1984/jenkins-producer
+beee9f30bc1f: Mounted from samer1984/jenkins-producer
+977fc1221c2c: Pushed
+latest: digest: sha256:d7db7076af89cc12709274dd766026ee2d3a55ba691431ae86031122bb7bcb6f size: 1787
+[Pipeline] }
+[Pipeline] // withDockerRegistry
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+Finished: SUCCESS
