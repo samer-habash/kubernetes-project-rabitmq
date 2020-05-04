@@ -16,4 +16,6 @@ services:
     links:
     - rabbitmq
     # run the producer sending random messages -r times
+    # the file .env has the value of the Message_Count
+    # thats why you should run the docker-compose up from the same path that exists
     command: python producer.py -p 5672 -s rabbitmq -r ${Message_Count}
