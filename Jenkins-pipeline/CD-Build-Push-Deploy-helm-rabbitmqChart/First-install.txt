@@ -1,0 +1,199 @@
+Started by user admin
+Running in Durability level: MAX_SURVIVABILITY
+[Pipeline] Start of Pipeline
+[Pipeline] podTemplate
+[Pipeline] {
+[Pipeline] node
+Still waiting to schedule task
+Waiting for next available executor
+Created Pod: default/kubernetes-project-pod-label-l4dgp-g7582
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Scheduled] Successfully assigned default/kubernetes-project-pod-label-l4dgp-g7582 to sam-xps
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Pulling] Pulling image "samer1984/helm-kubectl-alpine"
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Pulled] Successfully pulled image "samer1984/helm-kubectl-alpine"
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Created] Created container helm
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Started] Started container helm
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Pulled] Container image "jenkins/jnlp-slave:4.0.1-1" already present on machine
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Created] Created container jnlp
+[Normal][default/kubernetes-project-pod-label-l4dgp-g7582][Started] Started container jnlp
+Agent kubernetes-project-pod-label-l4dgp-g7582 is provisioned from template kubernetes-project-pod-label-l4dgp
+---
+apiVersion: "v1"
+kind: "Pod"
+metadata:
+  annotations:
+    buildUrl: "http://jenkins:8080/job/CD-Build-Push-Deploy-helm-rabbitmqChart/155/"
+    runUrl: "job/CD-Build-Push-Deploy-helm-rabbitmqChart/155/"
+  labels:
+    jenkins/jenkins-slave: "true"
+    jenkins/label: "kubernetes-project-pod-label"
+  name: "kubernetes-project-pod-label-l4dgp-g7582"
+spec:
+  containers:
+  - command:
+    - "cat"
+    image: "samer1984/helm-kubectl-alpine"
+    name: "helm"
+    tty: true
+    volumeMounts:
+    - mountPath: "/root/.kube"
+      name: "kube-config"
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  - env:
+    - name: "JENKINS_SECRET"
+      value: "********"
+    - name: "JENKINS_TUNNEL"
+      value: "jenkins-agent:50000"
+    - name: "JENKINS_AGENT_NAME"
+      value: "kubernetes-project-pod-label-l4dgp-g7582"
+    - name: "JENKINS_NAME"
+      value: "kubernetes-project-pod-label-l4dgp-g7582"
+    - name: "JENKINS_AGENT_WORKDIR"
+      value: "/home/jenkins/agent"
+    - name: "JENKINS_URL"
+      value: "http://jenkins:8080/"
+    image: "jenkins/jnlp-slave:4.0.1-1"
+    name: "jnlp"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+    volumeMounts:
+    - mountPath: "/home/jenkins/agent"
+      name: "workspace-volume"
+      readOnly: false
+  nodeSelector:
+    beta.kubernetes.io/os: "linux"
+  restartPolicy: "Never"
+  securityContext: {}
+  volumes:
+  - hostPath:
+      path: "/home/sam/.kube/kubeconfig-to-let-jenkins-connect"
+    name: "kube-config"
+  - emptyDir:
+      medium: ""
+    name: "workspace-volume"
+
+Running on kubernetes-project-pod-label-l4dgp-g7582 in /home/jenkins/agent/workspace/CD-Build-Push-Deploy-helm-rabbitmqChart
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Checkout SCM)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] sh
++ git clone https://github.com/samer-habash/kubernetes-project-helm-charts
+Cloning into 'kubernetes-project-helm-charts'...
+[Pipeline] dir
+Running in /home/jenkins/agent/workspace/CD-Build-Push-Deploy-helm-rabbitmqChart/kubernetes-project-helm-charts
+[Pipeline] {
+[Pipeline] sh
++ git checkout gh-pages
+Branch 'gh-pages' set up to track remote branch 'gh-pages' from 'origin'.
+Switched to a new branch 'gh-pages'
++ git checkout master rabbitmq-chart
+Updated 10 paths from 88c6a24
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Package chart and commit)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] dir
+Running in /home/jenkins/agent/workspace/CD-Build-Push-Deploy-helm-rabbitmqChart/kubernetes-project-helm-charts
+[Pipeline] {
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ helm package rabbitmq-chart --destination index/
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] sh
++ helm repo index index --url https://samer-habash.github.io/kubernetes-project-helm-charts/index/
++ rm -rf rabbitmq-chart
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Commit and Push index gh-pages)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] withCredentials
+Masking supported pattern matches of $Username or $Password
+[Pipeline] {
+[Pipeline] dir
+Running in /home/jenkins/agent/workspace/CD-Build-Push-Deploy-helm-rabbitmqChart/kubernetes-project-helm-charts
+[Pipeline] {
+[Pipeline] sh
++ git config --local credential.helper '!f() { echo username=\****; echo password=\****; }; f'
++ git config user.email samer.habash1984.devops@gmail.com
++ git add .
++ git commit -am '[Jenkins CI] added new helm package : null'
+[gh-pages 73ff743] [Jenkins CI] added new helm package : null
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+ rewrite index/rabbitmq-chart-0.1.3.tgz (96%)
++ git push
+To https://github.com/****/kubernetes-project-helm-charts
+   1d9f77d..73ff743  gh-pages -> gh-pages
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (helm add repo and deploy)
+[Pipeline] container
+[Pipeline] {
+[Pipeline] dir
+Running in /home/jenkins/agent/workspace/CD-Build-Push-Deploy-helm-rabbitmqChart/kubernetes-project-helm-charts
+[Pipeline] {
+[Pipeline] sh
++ helm repo add rabbitmq-chart-0.1.3 https://samer-habash.github.io/kubernetes-project-helm-charts/index/
+"rabbitmq-chart-0.1.3" has been added to your repositories
++ helm repo update
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "rabbitmq-chart-0.1.3" chart repository
+Update Complete. ⎈ Happy Helming!⎈ 
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
++ helm list --deployed --short --filter rabbitmq-chart
+[Pipeline] echo
+
+[Pipeline] sh
++ helm install rabbitmq-chart-0.1.3 rabbitmq-chart-0.1.3/rabbitmq-chart
+NAME: rabbitmq-chart-0.1.3
+LAST DEPLOYED: Thu May  7 23:21:48 2020
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=rabbitmq-chart-0.1.3,app.kubernetes.io/instance=rabbitmq-chart-0.1.3" -o jsonpath="{.items[0].metadata.name}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:80
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] }
+[Pipeline] // dir
+[Pipeline] }
+[Pipeline] // container
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] }
+[Pipeline] // podTemplate
+[Pipeline] End of Pipeline
+Finished: SUCCESS

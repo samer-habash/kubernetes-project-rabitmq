@@ -41,6 +41,7 @@ if __name__ == '__main__':
     channel.basic_consume(on_message, 'pc')
 
     try:
+        # the  "start_consuming" method will trigger an infinite loop so that the consumer will wait for a message
         channel.start_consuming()
     except KeyboardInterrupt:
         channel.stop_consuming()
