@@ -93,18 +93,20 @@ spec:
                     helm repo update
                 """)
                 script {
-                    def chartExist = sh(returnStdout: true, script: "helm list --deployed --short --filter \"${chartname}\"")
-                    println(chartExist)
-                    // check if rabbitmq is deployed and the latest version
-                    if(chartExist.contains(chartname) && chartExist.contains(chartVersion)) {
-                        println("Chart" + " " + chartname + "exists and latest verison : " + chartVersion)
+                    def helmList = sh(returnStdout: true, script: "helm list --deployed --short")
+                    // check if rabbitmq is deployed
+                    if (!helmList.contains(chartname)) {
+                        sh "helm install ${chartname} ${chartVersion}/${chartname}"
+                        
                     }
                     // check if rabbitmq is deployed and NOT the latest version
-                    else if(chartExist.contains(chartname) && !chartExist.contains(chartVersion)) {
+                    else if(helmList.contains(chartname) && !helmList.contains(chartVersion)) {
                         sh "helm upgrade ${chartname} ${chartVersion}/${chartname}"
                     }
+                    // check if rabbitmq is deployed and the latest version
                     else {
-                        sh "helm install ${chartname} ${chartVersion}/${chartname}"
+                        
+                        println("Chart" + " " + chartname + "exists and latest verison : " + chartVersion)
                     }
                 }
             }
