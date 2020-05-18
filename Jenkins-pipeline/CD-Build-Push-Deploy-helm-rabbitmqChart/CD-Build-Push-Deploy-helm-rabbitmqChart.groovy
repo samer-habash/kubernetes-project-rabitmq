@@ -93,7 +93,7 @@ spec:
                     helm repo update
                 """)
                 script {
-                    def helmList = sh(returnStdout: true, script: "helm list --deployed --short")
+                    def helmList = sh(returnStdout: true, script: "helm list --deployed")
                     // check if rabbitmq is deployed
                     if (!helmList.contains(chartname)) {
                         sh "helm install ${chartname} ${chartVersion}/${chartname}"
@@ -106,7 +106,7 @@ spec:
                     // check if rabbitmq is deployed and the latest version
                     else {
                         
-                        println("Chart" + " " + chartname + "exists and latest verison : " + chartVersion)
+                        println("Chart " + chartname + " exists and latest verison : " + chartVersion)
                     }
                 }
             }
